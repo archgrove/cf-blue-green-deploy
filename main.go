@@ -62,7 +62,7 @@ func (p *CfPlugin) Deploy(defaultCfDomain string, repo manifest.ManifestReposito
 	}
 
 	newAppRoutes := []Route{}
-	f := ManifestAppFinder{AppName: appName, Repo: repo}
+	f := ManifestAppFinder{AppName: appName, ManifestFile: ExtractManifestFile(args), Repo: repo}
 	if manifestRoutes := f.RoutesFromManifest(defaultCfDomain); manifestRoutes != nil {
 		newAppRoutes = append(newAppRoutes, manifestRoutes...)
 	}
@@ -157,6 +157,13 @@ func ExtractIntegrationTestScript(args []string) string {
 	script := f.String("smoke-test", "", "")
 	f.Parse(args[2:])
 	return *script
+}
+
+func ExtractManifestFile(args []string) string {
+	f := flag.NewFlagSet("blue-green-deploy", flag.ExitOnError)
+	manifest := f.String("f", "./", "")
+	f.Parse(args[2:])
+	return *manifest
 }
 
 func main() {
